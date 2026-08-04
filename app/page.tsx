@@ -16,7 +16,7 @@ export default async function Page() {
   const profileImageUrl = settings.site_logo || "/uploads/hero-profile.png";
 
   return (
-    <main class="bg-slate-950 min-h-screen">
+    <main className="bg-slate-950 min-h-screen">
       <Hero 
         initialTitle={heroTitle}
         typingStrings={typingStrings}
