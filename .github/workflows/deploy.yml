@@ -41,18 +41,19 @@ jobs:
             cp -r backend/* deploy_me/api/
           fi
 
-      # 5. Deploy to cPanel Subdomain via Native Rsync (Secure)
-      - name: Deploy via Native Rsync (Secure)
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          # Safely write the raw multiline SSH key, stripping any CRLF carriage returns
-          printf "%s\n" "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+      # 5. Install SSH Key (PEM/OpenSSH safe)
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          name: id_rsa
           
+      # 6. Deploy to cPanel Subdomain via Native Rsync
+      - name: Deploy via Native Rsync (Secure)
+        run: |
           # Scan host key and add to known_hosts
+          mkdir -p ~/.ssh
           ssh-keyscan -p 22 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts
           
-          # Sync files to cPanel subdomain
-          rsync -avz -e "ssh -p 22 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./deploy_me/ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:/home/muhammadfz/mf.muhammadfazal.com/
+          # Sync files to cPanel subdomain using the loaded key from ssh-agent
+          rsync -avz -e "ssh -p 22 -o StrictHostKeyChecking=no" ./deploy_me/ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:/home/muhammadfz/mf.muhammadfazal.com/
