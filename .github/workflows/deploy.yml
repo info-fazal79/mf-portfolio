@@ -52,9 +52,16 @@ jobs:
       # 6. Deploy to cPanel Subdomain via Native Rsync
       - name: Deploy via Native Rsync (Secure)
         run: |
+          # Failsafe: strip any carriage returns from the action-written key
+          tr -d '\r' < ~/.ssh/id_rsa > ~/.ssh/id_rsa.tmp && mv ~/.ssh/id_rsa.tmp ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Run diagnostic to confirm key validation
+          ssh-keygen -l -f ~/.ssh/id_rsa
+          
           # Scan host key and add to known_hosts
           mkdir -p ~/.ssh
           ssh-keyscan -p 22 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts
           
-          # Sync files to cPanel subdomain using the loaded key from ssh-agent
-          rsync -avz -e "ssh -p 22 -o StrictHostKeyChecking=no" ./deploy_me/ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:/home/muhammadfz/mf.muhammadfazal.com/
+          # Sync files to cPanel subdomain using the loaded key
+          rsync -avz -e "ssh -p 22 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./deploy_me/ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:/home/muhammadfz/mf.muhammadfazal.com/
