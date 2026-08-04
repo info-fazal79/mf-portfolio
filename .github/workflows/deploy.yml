@@ -41,13 +41,13 @@ jobs:
             cp -r backend/* deploy_me/api/
           fi
 
-      # 5. Deploy to cPanel Subdomain via SFTP
-      - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          username: ${{ secrets.FTP_USERNAME }}
-          server: ${{ secrets.FTP_SERVER }}
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          local_path: ./deploy_me/
-          remote_path: /home/muhammadfz/mf.muhammadfazal.com/
+      # 5. Deploy to cPanel Subdomain via SSH (easingthemes/ssh-deploy)
+      - name: SSH Deploy
+        uses: easingthemes/ssh-deploy@v4.1.8
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+          REMOTE_HOST: ${{ secrets.FTP_SERVER }}
+          REMOTE_USER: ${{ secrets.FTP_USERNAME }}
+          SOURCE: "deploy_me/"
+          TARGET: "/home/muhammadfz/mf.muhammadfazal.com/"
