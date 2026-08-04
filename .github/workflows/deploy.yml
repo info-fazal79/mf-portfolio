@@ -47,8 +47,8 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          # Safely write the raw multiline SSH key, preserving all formatting perfectly
-          printf "%s\n" "$SSH_KEY" > ~/.ssh/id_rsa
+          # Safely write the raw multiline SSH key, stripping any CRLF carriage returns
+          printf "%s\n" "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
           # Scan host key and add to known_hosts
