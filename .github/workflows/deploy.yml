@@ -50,3 +50,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy_me/
           server-dir: /public_html/mf/
+          protocol: ftp
+          port: 21
+          force-pasv: true
