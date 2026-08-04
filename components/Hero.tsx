@@ -17,16 +17,46 @@ export default function Hero({
   cvUrl = "/uploads/cv.pdf",
   profileImageUrl = "/uploads/hero-profile.png"
 }: HeroProps) {
+  const [title, setTitle] = useState(initialTitle);
+  const [typingTextList, setTypingTextList] = useState(typingStrings);
+  const [cv, setCv] = useState(cvUrl);
+  const [profileImage, setProfileImage] = useState(profileImageUrl);
+
   const [currentText, setCurrentText] = useState('');
   const [loopNum, setLoopNum] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(150);
 
   useEffect(() => {
+    async function loadSettings() {
+      try {
+        const { getSettings } = await import('@/utils/api');
+        const settings = await getSettings();
+        if (settings.seo_title) {
+          setTitle(settings.seo_title.split('|')[0].trim());
+        }
+        if (settings.hero_typing_text) {
+          setTypingTextList(settings.hero_typing_text);
+        }
+        if (settings.hero_cv_path) {
+          setCv(settings.hero_cv_path);
+        }
+        if (settings.site_logo) {
+          setProfileImage(settings.site_logo);
+        }
+      } catch (err) {
+        console.error("Error loading client settings:", err);
+      }
+    }
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
     let timer: NodeJS.Timeout;
     const handleTyping = () => {
-      const i = loopNum % typingStrings.length;
-      const fullText = typingStrings[i];
+      if (typingTextList.length === 0) return;
+      const i = loopNum % typingTextList.length;
+      const fullText = typingTextList[i];
 
       if (isDeleting) {
         setCurrentText(fullText.substring(0, currentText.length - 1));
@@ -47,7 +77,7 @@ export default function Hero({
 
     timer = setTimeout(handleTyping, typingSpeed);
     return () => clearTimeout(timer);
-  }, [currentText, isDeleting, loopNum, typingSpeed, typingStrings]);
+  }, [currentText, isDeleting, loopNum, typingSpeed, typingTextList]);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-slate-950 text-white overflow-hidden py-20 px-4">
@@ -66,7 +96,7 @@ export default function Hero({
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">
-            Hi, I'm <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">{initialTitle}</span>
+            Hi, I'm <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">{title}</span>
           </h1>
 
           <h2 className="text-xl sm:text-3xl font-medium text-slate-300 h-10">
@@ -88,7 +118,7 @@ export default function Hero({
               Get Consultation
             </button>
             <Link 
-              href={cvUrl} 
+              href={cv} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-medium rounded-lg backdrop-blur-md transition duration-300 text-center"
@@ -108,8 +138,8 @@ export default function Hero({
             <div className="relative w-full h-full rounded-3xl p-3 border border-slate-800 bg-slate-900/50 backdrop-blur-xl overflow-hidden shadow-2xl transition duration-500 group-hover:scale-[1.02] group-hover:border-slate-700/50">
               <div className="relative w-full h-full rounded-2xl overflow-hidden bg-slate-950">
                 <Image
-                  src={profileImageUrl}
-                  alt={initialTitle}
+                  src={profileImage}
+                  alt={title}
                   fill
                   priority
                   className="object-cover transition duration-500 group-hover:scale-105"
