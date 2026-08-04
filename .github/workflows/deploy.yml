@@ -41,15 +41,14 @@ jobs:
             cp -r backend/* deploy_me/api/
           fi
 
-      # 5. Deploy to cPanel Subdomain via FTP
-      - name: FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      # 5. Deploy to cPanel Subdomain via SFTP
+      - name: SFTP Deploy
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./deploy_me/
-          server-dir: ./
-          protocol: ftp
-          port: 21
-          force-pasv: true
+          server: ${{ secrets.FTP_SERVER }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          local_path: ./deploy_me/
+          remote_path: /home/muhammadfz/mf.muhammadfazal.com/
+          sftp_only: true
