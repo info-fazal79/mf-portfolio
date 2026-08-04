@@ -1,0 +1,55 @@
+name: Build and Deploy to cPanel Subdomain
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout Repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Setup Node.js Environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # 3. Install Dependencies & Build Frontend
+      - name: Install Dependencies & Export Static Site
+        run: |
+          npm ci
+          npm run build
+
+      # 4. Prepare Deployment Bundle
+      - name: Prepare Deployment Directory
+        run: |
+          mkdir -p deploy_me
+          # Copy static frontend export contents to deploy_me
+          if [ -d "out" ]; then
+            cp -r out/* deploy_me/
+          fi
+          # Copy backend PHP code to deploy_me/api
+          if [ -d "backend" ]; then
+            mkdir -p deploy_me/api
+            cp -r backend/* deploy_me/api/
+          fi
+
+      # 5. Deploy to cPanel Subdomain via FTP
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy_me/
+          server-dir: /public_html/
+          # If deploying to a specific subdomain directory (e.g. mf.muhammadfazal.com),
+          # set server-dir to the document root of the subdomain, e.g. /public_html/mf/
+          # or simply /subdomains/mf/ depending on cPanel configuration.
