@@ -1,13 +1,14 @@
 <?php
 /**
  * Database connection setup using PDO
+ * Supports environment variables or default fallbacks
  */
 
 function getDatabaseConnection() {
-    $host = 'localhost';
-    $db   = 'portfolio_db';
-    $user = 'portfolio_user';
-    $pass = 'secure_password_here';
+    $host = getenv('DB_HOST') ?: 'localhost';
+    $db   = getenv('DB_NAME') ?: 'portfolio_db';
+    $user = getenv('DB_USER') ?: 'portfolio_user';
+    $pass = getenv('DB_PASS') ?: 'secure_password_here';
     $charset = 'utf8mb4';
 
     $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

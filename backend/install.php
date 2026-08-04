@@ -7,7 +7,7 @@
 header("Content-Type: application/json; charset=UTF-8");
 
 require_once __DIR__ . '/config/db.php';
-$schemaFile = __DIR__ . '/../database/schema.sql';
+$schemaFile = __DIR__ . '/database/schema.sql';
 
 if (!file_exists($schemaFile)) {
     http_response_code(500);

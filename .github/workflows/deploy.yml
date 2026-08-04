@@ -49,7 +49,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy_me/
-          server-dir: /public_html/
-          # If deploying to a specific subdomain directory (e.g. mf.muhammadfazal.com),
-          # set server-dir to the document root of the subdomain, e.g. /public_html/mf/
-          # or simply /subdomains/mf/ depending on cPanel configuration.
+          server-dir: /public_html/mf/
