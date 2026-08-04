@@ -65,4 +65,4 @@ jobs:
           ssh-keyscan -p 22 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts
           
           # Sync files to cPanel subdomain using scp (immune to shell version mismatch)
-          cd deploy_me && scp -r -P 22 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no . ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:/home/muhammadfz/mf.muhammadfazal.com/
+          cd deploy_me && scp -r -P 22 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no . ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:/home/muhammadfz/public_html/mf/
