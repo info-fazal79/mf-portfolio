@@ -41,12 +41,19 @@ jobs:
             cp -r backend/* deploy_me/api/
           fi
 
-      # 5. Deploy to cPanel Subdomain via SSH (easingthemes/ssh-deploy)
-      - name: SSH Deploy
-        uses: easingthemes/ssh-deploy@v4.1.8
+      # 5. Deploy to cPanel Subdomain via Native Rsync
+      - name: Deploy via Native Rsync
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.FTP_SERVER }}
-          REMOTE_USER: ${{ secrets.FTP_USERNAME }}
-          SOURCE: "deploy_me/"
-          TARGET: "/home/muhammadfz/mf.muhammadfazal.com/"
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          # Automatically clean carriage returns (\r) and ensure a trailing newline
+          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          echo "" >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Scan host key and append to known_hosts
+          ssh-keyscan -p 22 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts
+          
+          # Run standard native rsync transfer
+          rsync -avz -e "ssh -p 22 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./deploy_me/ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:/home/muhammadfz/mf.muhammadfazal.com/
