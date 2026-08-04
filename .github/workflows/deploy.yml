@@ -46,7 +46,6 @@ jobs:
         uses: easingthemes/ssh-deploy@v4.1.8
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
           REMOTE_HOST: ${{ secrets.FTP_SERVER }}
           REMOTE_USER: ${{ secrets.FTP_USERNAME }}
           SOURCE: "deploy_me/"

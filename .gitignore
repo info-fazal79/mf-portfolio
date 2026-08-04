@@ -1,0 +1,8 @@
+node_modules/
+.next/
+out/
+deploy_me/
+id_rsa
+id_rsa.pub
+*.log
+.env*
