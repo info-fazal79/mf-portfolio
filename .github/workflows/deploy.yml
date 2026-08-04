@@ -47,8 +47,8 @@ jobs:
           SSH_KEY_B64: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          # Decode the perfect binary key without any formatting issues
-          echo "$SSH_KEY_B64" | base64 -d > ~/.ssh/id_rsa
+          # Manually strip all spaces, carriage returns, and newlines, then decode
+          echo "$SSH_KEY_B64" | tr -d '\r \n' | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
           # Scan host key
